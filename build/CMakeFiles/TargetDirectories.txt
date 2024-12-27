@@ -1,4 +1,0 @@
-/Users/trisslazaj/Desktop/Fractal_Visualizer/build/CMakeFiles/fractal_visualizer.dir
-/Users/trisslazaj/Desktop/Fractal_Visualizer/build/CMakeFiles/glad.dir
-/Users/trisslazaj/Desktop/Fractal_Visualizer/build/CMakeFiles/edit_cache.dir
-/Users/trisslazaj/Desktop/Fractal_Visualizer/build/CMakeFiles/rebuild_cache.dir
