@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DGL_SILENCE_DEPRECATION)
 
 # Add the executable
-add_executable(fractal_visualizer src/main.cpp)
+add_executable(fractal_visualizer src/main.cpp src/Mandelbrot.cpp src/Shader.cpp)
 
 # Include directories for glad and GLFW
 include_directories(
