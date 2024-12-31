@@ -1,15 +1,17 @@
 #include "Mandelbrot.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <algorithm> // For std::max
 
 Mandelbrot::Mandelbrot(Shader& shader) : shader(shader) {
     // Define the quad for rendering (two triangles forming a rectangle)
     float vertices[] = {
-        -1.0f, -1.0f,
-         1.0f, -1.0f,
-        -1.0f,  1.0f,
-         1.0f,  1.0f
+        -1.0f, -1.0f, // Bottom-left
+         1.0f, -1.0f, // Bottom-right
+        -1.0f,  1.0f, // Top-left
+         1.0f,  1.0f  // Top-right
     };
 
+    // Generate and bind VAO and VBO
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
 
@@ -30,11 +32,11 @@ Mandelbrot::~Mandelbrot() {
 }
 
 void Mandelbrot::render(int width, int height) {
-    shader.use();
+    shader.use(); // Use the shader program
     glBindVertexArray(quadVAO);
 
     // Pass uniforms to the fragment shader
-    glUniform2f(glGetUniformLocation(shader.ID, "resolution"), (float)width, (float)height);
+    glUniform2f(glGetUniformLocation(shader.ID, "resolution"), static_cast<float>(width), static_cast<float>(height));
     glUniform2f(glGetUniformLocation(shader.ID, "offset"), offset.x, offset.y);
     glUniform1f(glGetUniformLocation(shader.ID, "zoom"), zoom);
     glUniform1i(glGetUniformLocation(shader.ID, "maxIterations"), maxIterations);
@@ -46,17 +48,17 @@ void Mandelbrot::render(int width, int height) {
 }
 
 void Mandelbrot::zoomIn(float factor) {
-    zoom *= factor;
+    zoom *= 1.0f + (factor * 0.1f); // Reduce sensitivity by applying smaller increments
 }
 
 void Mandelbrot::zoomOut(float factor) {
-    zoom /= factor;
+    zoom /= 1.0f + (factor * 0.1f); // Reduce sensitivity
 }
 
 void Mandelbrot::pan(float dx, float dy) {
-    offset += glm::vec2(dx / zoom, dy / zoom);
+    offset += glm::vec2(dx / (zoom * 5.0f), dy / (zoom * 5.0f)); // Adjust divisor for smoother panning
 }
 
 void Mandelbrot::setMaxIterations(int iterations) {
-    maxIterations = iterations;
+    maxIterations = std::max(iterations, 1); // Ensure at least 1 iteration
 }
