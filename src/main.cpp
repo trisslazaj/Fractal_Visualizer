@@ -14,9 +14,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 // Scroll callback for zooming
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     if (yoffset > 0) {
-        mandelbrotPtr->zoomIn(1.1f); // Zoom in
+        mandelbrotPtr->zoomIn(1.1f); 
     } else {
-        mandelbrotPtr->zoomOut(1.1f); // Zoom out
+        mandelbrotPtr->zoomOut(1.1f); 
     }
 }
 
@@ -40,9 +40,13 @@ int main() {
         return -1;
     }
 
+    // Query the actual framebuffer size
+    int fbWidth, fbHeight;
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    glViewport(0, 0, fbWidth, fbHeight);
+
     // Set the viewport and callback for window resizing
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glViewport(0, 0, 800, 600);
 
     // Initialize the shaders and Mandelbrot class
     Shader shader("../shaders/mandelbrot.vert", "../shaders/mandelbrot.frag");
@@ -58,6 +62,8 @@ int main() {
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
+        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+        
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Get window dimensions
