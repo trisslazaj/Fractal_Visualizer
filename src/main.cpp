@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "Shader.h"
-#include "Mandelbrot.h"
+#include "Shader.hpp"
+#include "Mandelbrot.hpp"
 #include <iostream>
 
 Mandelbrot* mandelbrotPtr = nullptr;
