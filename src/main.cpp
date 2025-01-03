@@ -2,108 +2,106 @@
 #include <GLFW/glfw3.h>
 #include "Shader.h"
 #include "Mandelbrot.h"
+#include <iostream>
 
-// Global Mandelbrot reference for the scroll callback
+// Global reference for scroll callback
 Mandelbrot* mandelbrotPtr = nullptr;
 
-// Callback to adjust viewport when the window is resized
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-}
-
-// Scroll callback for zooming
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+// Scroll callback for zoom in/out
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
     if (yoffset > 0) {
-        mandelbrotPtr->zoomIn(1.1f); 
+        // Zoom in by a factor of 1.1
+        mandelbrotPtr->zoomIn(1.1f);
     } else {
-        mandelbrotPtr->zoomOut(1.1f); 
+        // Zoom out by a factor of 1.1
+        mandelbrotPtr->zoomOut(1.1f);
     }
 }
 
-int main() {
-    // Initialize GLFW
+int main()
+{
+    // 1) Initialize GLFW
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // Create a windowed mode window and OpenGL context
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Mandelbrot Set", NULL, NULL);
+    // 2) Create the window
+    GLFWwindow* window = glfwCreateWindow(1280, 960, "Mandelbrot Set", nullptr, nullptr);
     if (!window) {
+        std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
 
-    // Load OpenGL using GLAD
+    // 3) Initialize GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cerr << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
-    // Query the actual framebuffer size
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-    glViewport(0, 0, fbWidth, fbHeight);
-
-    // Set the viewport and callback for window resizing
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // Initialize the shaders and Mandelbrot class
+    // 4) Create and load the shader
     Shader shader("../shaders/mandelbrot.vert", "../shaders/mandelbrot.frag");
-    Mandelbrot mandelbrot(shader);
-    mandelbrotPtr = &mandelbrot; // Assign global pointer for callback access
 
-    // Set the scroll callback
+    // 5) Create Mandelbrot object
+    Mandelbrot mandelbrot(shader);
+    mandelbrotPtr = &mandelbrot;
+
+    // 6) Set scroll callback for zoom
     glfwSetScrollCallback(window, scroll_callback);
 
-    // Variables to track mouse movement for panning
-    double lastX = 0.0, lastY = 0.0;
+    // Variables for mouse-panning
     bool mousePressed = false;
+    double lastX = 0.0, lastY = 0.0;
 
-    // Render loop
-    while (!glfwWindowShouldClose(window)) {
+    // 7) Main render loop
+    while (!glfwWindowShouldClose(window))
+    {
+        // A) Query the *actual* framebuffer size each frame
+        int fbWidth, fbHeight;
+        glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+
+        // B) Update the viewport to match the entire framebuffer
+        glViewport(0, 0, fbWidth, fbHeight);
+
+        // C) Clear the screen
         glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
-        
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Get window dimensions
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        // D) Render the Mandelbrot
+        mandelbrot.render(fbWidth, fbHeight);
 
-        // Render the Mandelbrot set
-        mandelbrot.render(width, height);
-
-        // Swap buffers and poll events
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-
-        // Handle panning inputs
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        // E) Handle mouse input for panning
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        {
             if (!mousePressed) {
-                // Record the initial mouse position when the button is pressed
                 glfwGetCursorPos(window, &lastX, &lastY);
                 mousePressed = true;
             } else {
-                // Calculate panning offset
                 double currentX, currentY;
                 glfwGetCursorPos(window, &currentX, &currentY);
 
                 double dx = currentX - lastX;
                 double dy = currentY - lastY;
 
-                // Pan the fractal
-                mandelbrot.pan(dx * 0.01f, -dy * 0.01f);
+                mandelbrot.pan(dx, dy, fbWidth, fbHeight);
 
-                // Update last cursor position
                 lastX = currentX;
                 lastY = currentY;
             }
-        } else {
-            mousePressed = false; // Reset mouse state when the button is released
         }
+        else {
+            mousePressed = false;
+        }
+
+        // F) Swap buffers and poll events
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
 
-    // Clean up and exit
+    // 8) Clean up
     glfwTerminate();
     return 0;
 }
