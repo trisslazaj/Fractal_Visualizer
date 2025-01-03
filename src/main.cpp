@@ -2,56 +2,89 @@
 #include <GLFW/glfw3.h>
 #include "Shader.h"
 #include "Mandelbrot.h"
+#include <iostream>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
+Mandelbrot* mandelbrotPtr = nullptr;
+
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (yoffset > 0) {
+        mandelbrotPtr->zoomIn(1.1f);
+    } else {
+        mandelbrotPtr->zoomOut(1.1f);
+    }
 }
 
-int main() {
-    // Initialize GLFW
+int main()
+{
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // Create a windowed mode window and OpenGL context
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Mandelbrot Set", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 960, "Mandelbrot Set", nullptr, nullptr);
     if (!window) {
+        std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
 
-    // Load OpenGL using GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cerr << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
-    // Set the viewport and callback for window resizing
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glViewport(0, 0, 800, 600);
-
-    // Initialize the shaders and Mandelbrot class
     Shader shader("../shaders/mandelbrot.vert", "../shaders/mandelbrot.frag");
-    Mandelbrot mandelbrot(shader);
 
-    // Render loop
-    while (!glfwWindowShouldClose(window)) {
+    Mandelbrot mandelbrot(shader);
+    mandelbrotPtr = &mandelbrot;
+
+    glfwSetScrollCallback(window, scroll_callback);
+
+    bool mousePressed = false;
+    double lastX = 0.0, lastY = 0.0;
+
+    while (!glfwWindowShouldClose(window))
+    {
+       
+        int fbWidth, fbHeight;
+        glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+
+        glViewport(0, 0, fbWidth, fbHeight);
+
+        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Get window dimensions
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        mandelbrot.render(fbWidth, fbHeight);
 
-        // Render the Mandelbrot set
-        mandelbrot.render(width, height);
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        {
+            if (!mousePressed) {
+                glfwGetCursorPos(window, &lastX, &lastY);
+                mousePressed = true;
+            } else {
+                double currentX, currentY;
+                glfwGetCursorPos(window, &currentX, &currentY);
 
-        // Swap buffers and poll events
+                double dx = currentX - lastX;
+                double dy = currentY - lastY;
+
+                mandelbrot.pan(dx, dy, fbWidth, fbHeight);
+
+                lastX = currentX;
+                lastY = currentY;
+            }
+        }
+        else {
+            mousePressed = false;
+        }
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    // Clean up and exit
     glfwTerminate();
     return 0;
 }

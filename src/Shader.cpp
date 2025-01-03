@@ -4,21 +4,18 @@
 #include <sstream>
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
-    // Load vertex shader
     std::string vertexCode;
     std::ifstream vShaderFile(vertexPath);
     std::stringstream vShaderStream;
     vShaderStream << vShaderFile.rdbuf();
     vertexCode = vShaderStream.str();
 
-    // Load fragment shader
     std::string fragmentCode;
     std::ifstream fShaderFile(fragmentPath);
     std::stringstream fShaderStream;
     fShaderStream << fShaderFile.rdbuf();
     fragmentCode = fShaderStream.str();
 
-    // Compile shaders
     const char* vShaderCode = vertexCode.c_str();
     const char* fShaderCode = fragmentCode.c_str();
 
@@ -32,14 +29,13 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     glCompileShader(fragmentShader);
     checkCompileErrors(fragmentShader, "FRAGMENT");
 
-    // Link shaders
     ID = glCreateProgram();
     glAttachShader(ID, vertexShader);
     glAttachShader(ID, fragmentShader);
     glLinkProgram(ID);
     checkCompileErrors(ID, "PROGRAM");
 
-    // Delete shaders
+
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 }
