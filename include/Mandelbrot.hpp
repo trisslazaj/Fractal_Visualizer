@@ -1,7 +1,7 @@
 #ifndef MANDELBROT_H
 #define MANDELBROT_H
 
-#include "Shader.h"
+#include "Shader.hpp"
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 

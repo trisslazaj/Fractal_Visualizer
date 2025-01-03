@@ -1,4 +1,4 @@
-#include "Mandelbrot.h"
+#include "Mandelbrot.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include <algorithm>
 #include <iostream>  
