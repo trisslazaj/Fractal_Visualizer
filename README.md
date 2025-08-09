@@ -47,14 +47,14 @@ winget install Microsoft.VisualStudio.2022.BuildTools
 
 - NMake (simple, single-config):
 ```cmd
-cd C:\Users\tani\Fractal_Visualizer
+cd into project directory
 cmake -S . -B build_nmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
 cmake --build build_nmake
 ```
 
 - Visual Studio solution (multi-config):
 ```cmd
-cd C:\Users\tani\Fractal_Visualizer
+cd into project directory
 cmake -S . -B build_vs -G "Visual Studio 17 2022" -A x64
 cmake --build build_vs --config Release
 ```
