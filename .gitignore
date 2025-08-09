@@ -1,3 +1,48 @@
+# Build directories
+/build/
+/build_*/
+/cmake-build-*/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# Dependencies fetched by CMake FetchContent
+/_deps/
+build*/_deps/
+
+# Binaries and libraries
+/bin/
+/lib/
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.pdb
+*.obj
+*.o
+
+# Visual Studio / IDE
+.vs/
+*.sln
+*.vcxproj*
+.idea/
+.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
 # Prerequisites
 *.d
 

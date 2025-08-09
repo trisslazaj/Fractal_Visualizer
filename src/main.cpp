@@ -3,6 +3,8 @@
 #include "Shader.hpp"
 #include "Mandelbrot.hpp"
 #include <iostream>
+#include <filesystem>
+#include <string>
 
 Mandelbrot* mandelbrotPtr = nullptr;
 
@@ -36,7 +38,17 @@ int main()
         return -1;
     }
 
-    Shader shader("../shaders/mandelbrot.vert", "../shaders/mandelbrot.frag");
+    auto resolvePath = [](const std::string& pathFromBin, const std::string& pathFromRepo) {
+        namespace fs = std::filesystem;
+        if (fs::exists(pathFromBin)) return pathFromBin;
+        if (fs::exists(pathFromRepo)) return pathFromRepo;
+        return pathFromBin; // fallback
+    };
+
+    const std::string vertPath = resolvePath("../shaders/mandelbrot.vert", "shaders/mandelbrot.vert");
+    const std::string fragPath = resolvePath("../shaders/mandelbrot.frag", "shaders/mandelbrot.frag");
+
+    Shader shader(vertPath.c_str(), fragPath.c_str());
 
     Mandelbrot mandelbrot(shader);
     mandelbrotPtr = &mandelbrot;

@@ -6,15 +6,36 @@
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     std::string vertexCode;
     std::ifstream vShaderFile(vertexPath);
+    if (!vShaderFile) {
+        std::cerr << "Failed to open vertex shader: " << vertexPath << std::endl;
+    }
     std::stringstream vShaderStream;
     vShaderStream << vShaderFile.rdbuf();
     vertexCode = vShaderStream.str();
 
     std::string fragmentCode;
     std::ifstream fShaderFile(fragmentPath);
+    if (!fShaderFile) {
+        std::cerr << "Failed to open fragment shader: " << fragmentPath << std::endl;
+    }
     std::stringstream fShaderStream;
     fShaderStream << fShaderFile.rdbuf();
     fragmentCode = fShaderStream.str();
+
+    if (vertexCode.empty()) {
+        std::cerr << "Vertex shader source empty; using fallback passthrough shader." << std::endl;
+        vertexCode =
+            "#version 330 core\n"
+            "layout(location=0) in vec2 aPos;\n"
+            "void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }\n";
+    }
+    if (fragmentCode.empty()) {
+        std::cerr << "Fragment shader source empty; using fallback magenta shader." << std::endl;
+        fragmentCode =
+            "#version 330 core\n"
+            "out vec4 FragColor;\n"
+            "void main(){ FragColor = vec4(1.0, 0.0, 1.0, 1.0); }\n";
+    }
 
     const char* vShaderCode = vertexCode.c_str();
     const char* fShaderCode = fragmentCode.c_str();
