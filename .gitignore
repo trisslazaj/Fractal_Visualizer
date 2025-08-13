@@ -3,6 +3,12 @@
 /build_*/
 /cmake-build-*/
 
+# Documentation (allow images, ignore other docs)
+/docs/*.md
+!/docs/*.png
+!/docs/*.jpg
+!/docs/*.jpeg
+
 # CMake generated files
 CMakeCache.txt
 CMakeFiles/

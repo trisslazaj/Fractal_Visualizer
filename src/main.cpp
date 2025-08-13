@@ -2,19 +2,20 @@
 #include <GLFW/glfw3.h>
 #include "Shader.hpp"
 #include "Mandelbrot.hpp"
+#include "GUI.hpp"
 #include <iostream>
 #include <filesystem>
 #include <string>
 
 Mandelbrot* mandelbrotPtr = nullptr;
-
+GUI* guiPtr = nullptr;
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     if (yoffset > 0) {
-        mandelbrotPtr->zoomIn(1.1f);
+        mandelbrotPtr->zoomIn(mandelbrotPtr->getZoomSpeed());
     } else {
-        mandelbrotPtr->zoomOut(1.1f);
+        mandelbrotPtr->zoomOut(mandelbrotPtr->getZoomSpeed());
     }
 }
 
@@ -53,6 +54,38 @@ int main()
     Mandelbrot mandelbrot(shader);
     mandelbrotPtr = &mandelbrot;
 
+    GUI gui(window);
+    guiPtr = &gui;
+
+    // Set up GUI callbacks
+    gui.setPaletteChangedCallback([&mandelbrot](int palette) {
+        mandelbrot.setColorPalette(palette);
+    });
+    
+    gui.setColorScaleChangedCallback([&mandelbrot](float scale) {
+        mandelbrot.setColorScale(scale);
+    });
+    
+    gui.setColorOffsetChangedCallback([&mandelbrot](float offset) {
+        mandelbrot.setColorOffset(offset);
+    });
+    
+    gui.setSmoothColoringChangedCallback([&mandelbrot](bool smooth) {
+        mandelbrot.setSmoothColoring(smooth);
+    });
+    
+    gui.setMaxIterationsChangedCallback([&mandelbrot](int iterations) {
+        mandelbrot.setMaxIterations(iterations);
+    });
+    
+    gui.setZoomSpeedChangedCallback([&mandelbrot](float speed) {
+        mandelbrot.setZoomSpeed(speed);
+    });
+    
+    gui.setResetViewCallback([&mandelbrot]() {
+        mandelbrot.resetView();
+    });
+
     glfwSetScrollCallback(window, scroll_callback);
 
     bool mousePressed = false;
@@ -60,7 +93,6 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-       
         int fbWidth, fbHeight;
         glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
@@ -71,27 +103,35 @@ int main()
 
         mandelbrot.render(fbWidth, fbHeight);
 
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-        {
-            if (!mousePressed) {
-                glfwGetCursorPos(window, &lastX, &lastY);
-                mousePressed = true;
-            } else {
-                double currentX, currentY;
-                glfwGetCursorPos(window, &currentX, &currentY);
+        // Handle mouse input (only when not interacting with GUI)
+        if (!ImGui::GetIO().WantCaptureMouse) {
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+            {
+                if (!mousePressed) {
+                    glfwGetCursorPos(window, &lastX, &lastY);
+                    mousePressed = true;
+                } else {
+                    double currentX, currentY;
+                    glfwGetCursorPos(window, &currentX, &currentY);
 
-                double dx = currentX - lastX;
-                double dy = currentY - lastY;
+                    double dx = currentX - lastX;
+                    double dy = currentY - lastY;
 
-                mandelbrot.pan(dx, dy, fbWidth, fbHeight);
+                    mandelbrot.pan(dx, dy, fbWidth, fbHeight);
 
-                lastX = currentX;
-                lastY = currentY;
+                    lastX = currentX;
+                    lastY = currentY;
+                }
+            }
+            else {
+                mousePressed = false;
             }
         }
-        else {
-            mousePressed = false;
-        }
+
+        // Render GUI
+        gui.beginFrame();
+        gui.render();
+        gui.endFrame();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

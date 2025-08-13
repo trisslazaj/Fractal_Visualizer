@@ -56,6 +56,12 @@ void Mandelbrot::render(int width, int height)
                 offset.x, offset.y);
 
     glUniform1i(glGetUniformLocation(shader.ID, "maxIterations"), maxIterations);
+    
+    // Pass color uniforms
+    glUniform1i(glGetUniformLocation(shader.ID, "colorPalette"), colorPalette);
+    glUniform1f(glGetUniformLocation(shader.ID, "colorScale"), colorScale);
+    glUniform1f(glGetUniformLocation(shader.ID, "colorOffset"), colorOffset);
+    glUniform1i(glGetUniformLocation(shader.ID, "smoothColoring"), smoothColoring ? 1 : 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -108,4 +114,35 @@ void Mandelbrot::pan(double dxPixels, double dyPixels, int screenW, int screenH)
 
 void Mandelbrot::setMaxIterations(int iterations) {
     maxIterations = std::max(iterations, 1);
+}
+
+void Mandelbrot::setColorPalette(int palette) {
+    colorPalette = std::max(0, std::min(palette, 5)); // Clamp to 0-5
+}
+
+void Mandelbrot::setColorScale(float scale) {
+    colorScale = std::max(0.001f, std::min(scale, 0.5f)); // Clamp to reasonable range
+}
+
+void Mandelbrot::setColorOffset(float offset) {
+    colorOffset = offset; // No clamping needed
+}
+
+void Mandelbrot::setSmoothColoring(bool smooth) {
+    smoothColoring = smooth;
+}
+
+void Mandelbrot::setZoomSpeed(float speed) {
+    zoomSpeed = std::max(1.01f, std::min(speed, 2.0f)); // Clamp to reasonable range
+}
+
+void Mandelbrot::resetView() {
+    zoom = 1.0f;
+    offset = glm::vec2(-0.5f, 0.0f);
+    maxIterations = 500;
+    colorPalette = 0;
+    colorScale = 0.05f;
+    colorOffset = 0.0f;
+    smoothColoring = true;
+    zoomSpeed = 1.1f;
 }

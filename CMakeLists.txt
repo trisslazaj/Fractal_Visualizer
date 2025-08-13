@@ -64,6 +64,36 @@ if(NOT TARGET glm::glm)
   FetchContent_MakeAvailable(glm)
 endif()
 
+# Dear ImGui: fetch and build manually
+include(FetchContent)
+FetchContent_Declare(
+  imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG v1.90.1
+)
+FetchContent_GetProperties(imgui)
+if(NOT imgui_POPULATED)
+  FetchContent_Populate(imgui)
+endif()
+
+# Build ImGui as a library
+add_library(imgui_lib
+  ${imgui_SOURCE_DIR}/imgui.cpp
+  ${imgui_SOURCE_DIR}/imgui_demo.cpp
+  ${imgui_SOURCE_DIR}/imgui_draw.cpp
+  ${imgui_SOURCE_DIR}/imgui_tables.cpp
+  ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+)
+
+target_include_directories(imgui_lib PUBLIC 
+  ${imgui_SOURCE_DIR}
+  ${imgui_SOURCE_DIR}/backends
+)
+
+target_link_libraries(imgui_lib PUBLIC ${GLFW_TARGET})
+
 # GLAD from local source
 add_library(glad src/glad.c)
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
@@ -73,6 +103,7 @@ add_executable(fractal_visualizer
   src/main.cpp
   src/Mandelbrot.cpp
   src/Shader.cpp
+  src/GUI.cpp
 )
 
 target_include_directories(fractal_visualizer PRIVATE ${CMAKE_SOURCE_DIR}/include)
@@ -83,6 +114,7 @@ target_link_libraries(fractal_visualizer
     ${GLFW_TARGET}
     glad
     glm::glm
+    imgui_lib
 )
 
 # Output directory for the built executable

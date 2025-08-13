@@ -1,78 +1,70 @@
-# Dynamic Fractal Visualizer
+# Fractal Visualizer
 
-A dynamic fractal visualization tool written in C++ using the OpenGL library. This project generates and renders fractals such as the Mandelbrot set with real-time interaction, zooming, panning, and customizable rendering options.
+A modern, interactive fractal visualization tool built with C++, OpenGL, and Dear ImGui. Explore the Mandelbrot set with real-time color controls, smooth zooming, and a beautiful dark interface.
 
 ## Features
 
-- Real-time rendering of fractals (e.g., Mandelbrot set, Julia set).
-- Interactive zoom and pan functionality.
-- High-resolution rendering for intricate fractal details.
-- Dynamic parameter adjustments (e.g., colour schemes, iteration limits).
-- Smooth animations and user-friendly interface.
+### **Visual Controls**
+- **6 Color Palettes**: Sine Wave, Grayscale, Rainbow, Blue-Orange, Fire, Ocean
+- **Real-time Color Adjustment**: Scale and offset controls for fine-tuning
+- **Smooth vs Discrete Coloring**: Toggle between smooth gradients and banded colors
 
-## Getting Started
+### **Interactive Navigation**
+- **Mouse Wheel**: Zoom in/out with smooth scaling
+- **Left Click + Drag**: Pan around the fractal
+- **Adjustable Zoom Speed**: Control how fast you zoom
 
-### Prerequisites
+### **Rendering Options**
+- **Dynamic Iterations**: Adjust max iterations (10-2000) for detail vs performance
+- **Reset View**: Return to default position and settings
+- **Collapsible UI**: Hide/show control panels as needed
 
-To run this project, you need:
+### **Modern Interface**
+- **Dark Theme**: Sleek, modern dark interface
+- **Floating Panels**: Draggable control windows
+- **Menu Bar**: Easy access to view options and actions
 
-- A modern C++ compiler (e.g., GCC, Clang, or MSVC) with C++17 support.
-- OpenGL libraries (version 3.3 or higher recommended).
-- A build system such as `CMake` or `Make`.
-- GLFW library for window and input management.
-- GLAD library for OpenGL function loading.
-- Any other dependencies (to be added as the project progresses).
+## Screenshots
 
-## Build Instructions (explicit, step-by-step)
+### Default View (Sine Wave Palette)
+![Default View](docs/default-view.png)
 
-The project uses CMake and fetches GLFW/GLM automatically (no manual install required for those). GLAD is vendored.
+### Rainbow Palette
+![Rainbow Palette](docs/rainbow-palette.png)
 
-### Windows (Visual Studio 2022 Build Tools)
+### Fire Palette
+![Fire Palette](docs/fire-palette.png)
 
-1) Install tools (once):
+### Ocean Palette
+![Ocean Palette](docs/ocean-palette.png)
 
-```powershell
-winget install Kitware.CMake
-winget install Git.Git
-winget install Microsoft.VisualStudio.2022.BuildTools
-# Then open Visual Studio Installer and ensure "Desktop development with C++" workload is installed
-```
+### Zoomed Detail
+![Zoomed Detail](docs/zoomed-detail.png)
 
-2) Open the correct developer shell (important):
+### GUI Controls
+![GUI Controls](docs/gui-controls.png)
 
-- Start menu → Visual Studio 2022 → x64 Native Tools Command Prompt for VS 2022
-  (This preloads MSVC, NMake, and the SDKs.)
+## Quick Start
 
-3) Configure + build (choose ONE of the following generators):
+### Windows (Recommended)
+1. **Install Dependencies**:
+   ```powershell
+   winget install Kitware.CMake
+   winget install Git.Git
+   winget install Microsoft.VisualStudio.2022.BuildTools
+   ```
+   Then open Visual Studio Installer and add "Desktop development with C++"
 
-- NMake (simple, single-config):
-```cmd
-cd into project directory
-cmake -S . -B build_nmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
-cmake --build build_nmake
-```
-
-- Visual Studio solution (multi-config):
-```cmd
-cd into project directory
-cmake -S . -B build_vs -G "Visual Studio 17 2022" -A x64
-cmake --build build_vs --config Release
-```
-
-4) Run:
-
-```cmd
-build_nmake\bin\fractal_visualizer.exe
-:: or
-build_vs\bin\fractal_visualizer.exe
-```
-
-Notes:
-- If you see "generator mismatch" errors, use a fresh build directory (e.g., `build_nmake2`).
-- If `cl`/`nmake` are not found, you’re not in a proper developer shell.
+2. **Build & Run**:
+   ```cmd
+   # Open "x64 Native Tools Command Prompt for VS 2022"
+   cd C:\path\to\Fractal_Visualizer
+   cmake -S . -B build -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
+   cmake --build build
+   .\build\bin\fractal_visualizer.exe
+   ```
 
 ### macOS
-
 ```bash
 brew install cmake git
 git clone <this repo>
@@ -82,8 +74,7 @@ cmake --build build
 ./build/bin/fractal_visualizer
 ```
 
-### Linux (Ubuntu/Debian)
-
+### Linux
 ```bash
 sudo apt update
 sudo apt install -y build-essential cmake git xorg-dev libglu1-mesa-dev
@@ -94,9 +85,61 @@ cmake --build build -j
 ./build/bin/fractal_visualizer
 ```
 
-## Runtime
+## Controls
 
-- Zoom: mouse wheel
-- Pan: left mouse drag
+| Action | Control |
+|--------|---------|
+| **Zoom In/Out** | Mouse Wheel |
+| **Pan** | Left Click + Drag |
+| **Toggle Color Panel** | View → Color Panel |
+| **Toggle Parameter Panel** | View → Parameter Panel |
+| **Reset View** | Actions → Reset View |
 
-Resources (`shaders/`) are copied next to the build directory automatically. Running from the repo root or from the `bin/` folder both work.
+## Color Palettes
+
+1. **Sine Wave** - Classic smooth gradients with phase shifts
+2. **Grayscale** - Monochrome intensity mapping
+3. **Rainbow** - Full spectrum color cycling
+4. **Blue-Orange** - Warm/cool contrast palette
+5. **Fire** - Red-orange-yellow heat mapping
+6. **Ocean** - Blue-green underwater theme
+
+## Technical Details
+
+- **Language**: C++17
+- **Graphics**: OpenGL 3.3 Core Profile
+- **Window Management**: GLFW 3.3
+- **UI Framework**: Dear ImGui 1.90
+- **Math Library**: GLM 0.9.9
+- **Build System**: CMake 3.14+
+
+## Project Structure
+
+```
+Fractal_Visualizer/
+├── src/
+│   ├── main.cpp          # Application entry point
+│   ├── Mandelbrot.cpp    # Fractal rendering logic
+│   ├── Shader.cpp        # Shader management
+│   └── GUI.cpp           # User interface
+├── include/
+│   ├── Mandelbrot.hpp    # Fractal class header
+│   ├── Shader.hpp        # Shader class header
+│   ├── GUI.hpp           # GUI class header
+│   └── glad/             # OpenGL loader
+├── shaders/
+│   ├── mandelbrot.vert   # Vertex shader
+│   └── mandelbrot.frag   # Fragment shader (fractal logic)
+└── CMakeLists.txt        # Build configuration
+```
+
+## Future Enhancements
+
+- Julia Set support
+- Burning Ship fractal
+- Save/load view settings
+- Screenshot capture
+- Performance optimization
+- More color palettes
+
+**Built with ❤️ by Tani**
